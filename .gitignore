@@ -1,0 +1,12 @@
+# Environnement Python
+venv/
+__pycache__/
+*.pyc
+
+# Fichiers de configuration sensibles
+.env
+instance/
+
+# Fichiers IDE
+.vscode/
+.idea/
