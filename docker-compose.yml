@@ -1,0 +1,31 @@
+services:
+  # Service de l'application Web (Flask)
+  web:
+    build: .  # Construit l'image à partir du Dockerfile local
+    container_name: taskflow_web
+    ports:
+      - "5000:5000"  # Lie le port 5000 local au port 5000 du conteneur
+    volumes:
+      - .:/app    # Monte le dossier local dans le conteneur pour le hot-reload
+    env_file:
+      - .env      # Charge les variables d'environnement depuis le .env
+    depends_on:
+      - db        # S'assure que la BDD démarre avant l'app
+    command: ["flask", "run", "--host=0.0.0.0"] # Lance l'app en mode dev
+
+  # Service de la base de données (PostgreSQL)
+  db:
+    image: postgres:14-alpine # Utilise une image Postgres officielle
+    container_name: taskflow_db
+    environment:
+      # Ces variables doivent correspondre à celles du DATABASE_URL
+      POSTGRES_USER: taskflow_user
+      POSTGRES_PASSWORD: taskflow_pass
+      POSTGRES_DB: taskflow_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persiste les données de la BDD
+    ports:
+      - "5432:5432" # (Optionnel) Expose le port de la BDD à l'hôte local
+
+volumes:
+  postgres_data: # Définit le volume pour la persistance des données
