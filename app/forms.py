@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional
+
 from app.models import User
 
 class RegistrationForm(FlaskForm):
@@ -34,3 +35,9 @@ class LoginForm(FlaskForm):
     password = PasswordField('Mot de passe', 
                              validators=[DataRequired()])
     submit = SubmitField('Se connecter')
+
+class TaskForm(FlaskForm):
+    """Formulaire pour ajouter une nouvelle tâche"""
+    title = StringField('Titre de la tâche', validators=[DataRequired()])
+    description = TextAreaField('Description (optionnel)', validators=[Optional()])
+    submit = SubmitField('Ajouter la tâche')

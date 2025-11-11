@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mon tableau de bord - TaskFlow</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .task { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+        .task-done { background-color: #f0f0f0; text-decoration: line-through; }
+        .task-todo { background-color: #e6f7ff; }
+        .form-area { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .flash { padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+        .flash-success { background-color: #d4edda; color: #155724; }
+        .flash-info { background-color: #cce5ff; color: #004085; }
+    </style>
+</head>
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <h2>Bonjour, {{ current_user.username }} ! 
+        (<a href="{{ url_for('auth.logout') }}">Déconnexion</a>)
+    </h2>
+
+    <hr>
+
+    <div class="form-area">
+        <h3>Ajouter une nouvelle tâche</h3>
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.title.label }}<br>
+                {{ form.title(size=40) }}
+                {% for error in form.title.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.description.label }}<br>
+                {{ form.description(cols=40, rows=4) }}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    </div>
+
+    <hr>
+
+    <h3>Mes Tâches</h3>
+    <a href="{{ url_for('main.export_excel') }}">Exporter en Excel</a>
+
+    <div>
+        {% for task in tasks %}
+            <div class="task {% if task.status == 'done' %}task-done{% else %}task-todo{% endif %}">
+                <strong>{{ task.title }}</strong> (Statut: {{ task.status }})<br>
+                <small>{{ task.description or 'Pas de description' }}</small>
+                
+                <p style="margin-top: 10px;">
+                    {% if task.status != 'done' %}
+                    <a href="{{ url_for('main.complete', task_id=task.id) }}">Terminer</a> |
+                    {% endif %}
+                    <a href="{{ url_for('main.delete', task_id=task.id) }}" 
+                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?');">Supprimer</a>
+                </p>
+            </div>
+        {% else %}
+            <p>Vous n'avez pas encore de tâches. Ajoutez-en une !</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
